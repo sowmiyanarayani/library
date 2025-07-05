@@ -40,7 +40,7 @@ const getPayableQuantity = (item) =>
 
   
 const applyPercentageDiscount = (amount) =>
-  amount - (amount * 2) / 100;
+  amount - (amount * 2) / 100 ;
 
 const applyFixedAmount = (amount) =>
   amount - 5;

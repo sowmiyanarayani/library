@@ -1,5 +1,3 @@
-// dateUtils.js
-
  const getToday = () => new Date().toLocaleDateString();
 
  const calculateDueDate = (days) => {
@@ -7,8 +5,6 @@
   due.setDate(due.getDate() + days);
   return due.toLocaleDateString();
 };
-
-// dateUtils.js or fineUtils.js
 
  const calculateFine = (dueDate, returnDate, finePerDay) => {
   const due = new Date(dueDate);

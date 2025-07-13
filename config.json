@@ -1,0 +1,24 @@
+{
+  "borrowLimit": 3,
+  "maximumDays": 7,
+  "finePerDay": 5,
+  "books": [
+    { "id": 1, "title": "The Hobbit", "author": "J.R.R. Tolkien", "available": true },
+    { "id": 2, "title": "1984", "author": "George Orwell", "available": true },
+    { "id": 3, "title": "To Kill a Mockingbird", "author": "Harper Lee", "available": false },
+    { "id": 4, "title": "The Great Gatsby", "author": "F. Scott Fitzgerald", "available": true }
+  ],
+  
+  "users": {
+    "alice": {
+      "borrowed": [],
+      "history": [],
+      "fines": 0
+    },
+    "charlie": {
+      "borrowed": [],
+      "history": [],
+      "fines": 0
+    }
+  }
+}

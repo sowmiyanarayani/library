@@ -1,26 +1,13 @@
-const books = [
-  { id: 1, title: "The Hobbit", author: "J.R.R. Tolkien", available: true },
-  { id: 2, title: "1984", author: "George Orwell", available: true },
-  { id: 3, title: "To Kill a Mockingbird", author: "Harper Lee", available: false },
-  { id: 4, title: "The Great Gatsby", author: "F. Scott Fitzgerald", available: true }
-];
+import { readFile } from 'fs/promises';
+import { getToday, calculateDueDate, calculateFine } from './dateUtils.mjs';
 
-const users = {
-  alice: { borrowed: [], history: [], fines: 0 },
-  charlie: { borrowed: [], history: [], fines: 0 }
-};
-
-const borrowLimit = 3;
-const maximumDays = 7;
-const finePerDay = 5;
-
-
+const config = JSON.parse(await readFile('./config.json', 'utf-8'));
+const { books, users, borrowLimit, maximumDays, finePerDay } = config;
 
 const listBooks = () =>
   books
     .filter(book => book.available)
     .map(({ id, title, author }) => `${id}. ${title} by ${author}`);
-
 
 const updatedCheckOutBook = (user, bookId) => {
   const book = books.find(b => b.id === bookId);
@@ -28,11 +15,7 @@ const updatedCheckOutBook = (user, bookId) => {
   const available = book?.available;
   const underLimit = users[user]?.borrowed.length < borrowLimit;
 
-  const getToday = () => new Date().toLocaleDateString();
-
-  const due = new Date();
-        due.setDate(due.getDate() + maximumDays);
-        const dueDate = due.toLocaleDateString();
+  const dueDate = calculateDueDate(maximumDays);
 
   return !validUserAndBook
     ? "Invalid user or book."
@@ -45,11 +28,7 @@ const updatedCheckOutBook = (user, bookId) => {
         book.dueDate = dueDate;
 
         users[user].borrowed.push(bookId);
-        users[user].history.push({
-          bookId,
-          borrowedOn: getToday(),
-          dueDate
-        });
+        users[user].history.push({ bookId, borrowedOn: getToday(), dueDate });
 
         return `Checked out: ${book.title}. Due: ${dueDate}`;
       })();
@@ -65,10 +44,8 @@ const returnBook = (user, bookId) => {
     : !borrowed
     ? "Book not borrowed by user."
     : (() => {
-        const today = new Date();
-        const due = new Date(book.dueDate);
-        const overdueDays = Math.max(0, Math.ceil((today - due) / (1000 * 60 * 60 * 24)));
-        const fine = overdueDays * finePerDay;
+        const today = getToday();
+        const fine = calculateFine(book.dueDate, today, finePerDay);
 
         users[user].borrowed = users[user].borrowed.filter(id => id !== bookId);
         users[user].fines += fine;
@@ -81,8 +58,13 @@ const returnBook = (user, bookId) => {
       })();
 };
 
-const searchBooks = () =>  books.filter(book =>book.title.toLowerCase()||book.author.toLowerCase() );
-
+const searchBooks = (query) => {
+  const lower = query.toLowerCase();
+  return books.filter(book =>
+    book.title.toLowerCase().includes(lower) ||
+    book.author.toLowerCase().includes(lower)
+  );
+};
 
 const reserveBook = (user, bookId) => {
   const book = books.find(b => b.id === bookId);
@@ -100,7 +82,7 @@ const reserveBook = (user, bookId) => {
       })();
 };
 
-const registerUser = user =>
+const registerUser = (user) =>
   users[user]
     ? "User already exists."
     : (() => {
@@ -108,10 +90,9 @@ const registerUser = user =>
         return `User ${user} registered.`;
       })();
 
-
-console.log(registerUser("charlie"));               
-console.log(listBooks());                           
-console.log(updatedCheckOutBook("charlie", 1));          
-console.log(returnBook("charlie", 1));            
-console.log(searchBooks("mockingbird"));          
-console.log(reserveBook("alice", 3));         
+console.log(registerUser("charlie"));
+console.log(listBooks());
+console.log(updatedCheckOutBook("charlie", 1));
+console.log(returnBook("charlie", 1));
+console.log(searchBooks("mockingbird"));
+console.log(reserveBook("alice", 3));

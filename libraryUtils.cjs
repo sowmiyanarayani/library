@@ -16,10 +16,14 @@ const checkOutBook = (userName, book, users) => {
   book.available = false;
   const dueDate = calculateDueDate();
 
-  user.borrowed.push({ 
+  user.borrowed = [
+  ...user.borrowed,
+  {
     title: book.title,
-    dueDate 
-  });
+    dueDate
+  }
+];
+
 
   return `Book "${book.title}" successfully borrowed by ${userName}. Due date: ${dueDate}`;
 };
@@ -47,13 +51,13 @@ const returnBook = (userName, bookTitle, users, books, finePerDay) => {
 
   const returnDate = getToday();
   const fine = calculateFine(book.dueDate, returnDate, finePerDay);
-  const lateDays = fine / finePerDay;
-
-  return getReturnMessage(fine, lateDays); 
+  
+  return getReturnMessage(fine); 
 };
 
 
-module.exports = {
+module.exports =
+ {
   getToday,
   calculateDueDate,
   calculateFine,

@@ -9,7 +9,7 @@ const { books, users, borrowLimit,defaultUserData } = config;
 const listBooks = (books) =>
   books
     .filter(book => book.available)
-    .map(({ id, title, author, name }) => `${id}. ${title} by ${author}`);
+    .map(({ id, title, author}) => `${id}. ${title} by ${author}`);
 
 const isUserEligible = (userName, bookTitle, users, books) => {
   const user = users[userName];
@@ -20,9 +20,13 @@ const isUserEligible = (userName, bookTitle, users, books) => {
 };
 
 
-const searchBooks = () =>
-  books.map(book => `${book.id}. ${book.title} by ${book.author}`);
-
+const searchBooks = (keyword) =>
+  books
+    .filter(book =>
+      book.title.toLowerCase().includes(keyword.toLowerCase()) ||
+      book.author.toLowerCase().includes(keyword.toLowerCase())
+    )
+    .map(book => `${book.id}. ${book.title} by ${book.author}`);
 
 const createNewUser = (user) => (
   users[user] = { ...defaultUserData },
@@ -35,8 +39,8 @@ const registerUser = (user) =>
     : createNewUser(user);
 
 
-console.log(registerUser("bob"));
-console.log(listBooks(books));
-console.log(isUserEligible("alice", "The Great Gatsby", users, books));
-console.log(returnBook("alice", "JS Basics", users, books));
-console.log(searchBooks("orwell"));
+console.log("User Registration:",registerUser("bob"));
+console.log("Available books:", listBooks(books));
+console.log("User Eligibility Check:",isUserEligible("alice", "The Great Gatsby", users, books));
+console.log("Book Return Status:",returnBook("alice", "JS Basics", users, books));
+console.log("Search all books:",searchBooks("orwell"));
